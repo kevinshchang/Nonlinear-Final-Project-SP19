@@ -3,7 +3,7 @@
 % Playable Parameters:
 car_width = 1; % width of car in meters
 car_len = 6; % length of car in meters
-obs_vel = 0; % obstacle velocity
+obs_vel = 1; % obstacle velocity
 num_obs = 5; % number of obstacles
 lane_num = 3; % number of lanes
 lane_dist = 5; % distance in (y) for lanes in meters
@@ -37,7 +37,7 @@ for i = 1:num_obs
 end
 
 % Generating Environment:
-figure()
+f = figure();
 % Our car
 rectangle('Position', [0 (lane_dist/2 - car_width/2) car_len car_width], 'Curvature', 0.2, 'FaceColor', 'b', 'EdgeColor', 'b');
 hold on
@@ -53,7 +53,37 @@ end
 plot(xf(1), xf(2), '*');
 axis([0 end_dist 0 lane_num*lane_dist]);
 
-%% Generate Trajectory
-[X, dX, A] = generate_trajectory(x0, xf, 1, T);
+%% Generate and Plot Trajectory
+[X, dX, A] = generate_trajectories(x0, xf, 1, T);
 plot(X(1,:), X(2,:), '-r')
 hold off
+
+%% GIF?
+gif('test.gif')
+
+%%
+for t=1:1000
+    cla 
+    % Update and Plot Obstacles
+    for i = 1:num_obs
+        obs_vect(i).A = update_obstacle(obs_vect(i).A, i, 0.2);
+        plot_obstacle(obs_vect(i).A);
+    end
+    plot(X(1,:), X(2,:), '-r')
+    % Our car
+    rectangle('Position', [0 (lane_dist/2 - car_width/2) car_len car_width], 'Curvature', 0.2, 'FaceColor', 'b', 'EdgeColor', 'b');
+    hold on
+    % Adding lanes
+    for i = 1:lane_num-1
+        yline(lane_dist*i, 'k-.');
+    end
+    plot(xf(1), xf(2), '*');
+    axis([0 end_dist 0 lane_num*lane_dist]);
+    gif
+end
+
+%% PLAY GIF
+web('test.gif')
+
+
+
