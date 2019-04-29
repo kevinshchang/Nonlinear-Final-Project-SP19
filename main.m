@@ -1,5 +1,6 @@
 %% Main for "Dynamic" Obstacle Avoidance
-
+close all;
+clear all;
 % Playable Parameters:
 car_width = 1; % width of car in meters
 car_len = 6; % length of car in meters
@@ -10,14 +11,10 @@ lane_dist = 5; % distance in (y) for lanes in meters
 end_dist = 100; % distance in (x) for exit in meters
 exit_ang = 0.785; % exit angle in rads
 sim_time = 20; % simulation time for ode + controls
+S.k(1) = 1;
+S.k(2) = 2;
+S.l = car_width;
 
-% Choice of generation/tracking method:
-%   1. Differential Flatness
-%   2. Feedback Linearization
-%   3. Backstepping
-%   4. Velocity Obstacle 
-gt_type = 1;
-gt_re = 0; % boolean for resampling of trajectory generation per timestep
 
 % Car Parameters:
 l = car_width;
@@ -27,8 +24,22 @@ x0 = [car_len/2; lane_dist/2; 0]; % starting position
 xf = [end_dist; lane_num*lane_dist; exit_ang]; % desired end position
 T = sim_time;
 
-%% First Plot
 
+% Choice of generation/tracking method:
+%   1. Differential Flatness
+%   2. Feedback Linearization
+%   3. Backstepping
+%   4. Velocity Obstacle 
+gt_type = 3;
+gt_re = 0; % boolean for resampling of trajectory generation per timestep
+if (gt_type == 1)
+elseif (gt_type == 2)
+elseif (gt_type == 3)
+    x_state = [x0;0];
+elseif (gt_type == 4)
+end
+    
+%% First Plot
 % Generating Obstacles:
 for i = 1:num_obs
     y_rand = randi([1 3]);
@@ -38,47 +49,54 @@ end
 
 % Generating Environment:
 f = figure();
-% Our car
-rectangle('Position', [0 (lane_dist/2 - car_width/2) car_len car_width], 'Curvature', 0.2, 'FaceColor', 'b', 'EdgeColor', 'b');
-hold on
-% Adding lanes
-for i = 1:lane_num-1
-    yline(lane_dist*i, 'k-.');
-end
+%plot car
+plot_car(x_state, car_len, car_width);
+
+% Adding lanes and goal
+plot_lanes_goal(lane_num, lane_dist, xf, end_dist)
+
 % Adding obstacles
 for i = 1:num_obs
     plot_obstacle(obs_vect(i).A);
 end
-% Desired end position
-plot(xf(1), xf(2), '*');
-axis([0 end_dist 0 lane_num*lane_dist]);
 
-%% Generate and Plot Trajectory
+
+% Generate and Plot Trajectory
 [X, dX, A] = generate_trajectories(x0, xf, 1, T);
+S.A = A;
+
 plot(X(1,:), X(2,:), '-r')
 hold off
 
-%% GIF?
-gif('test.gif')
 
-%%
-for t=1:1000
+gif('test.gif')
+dt = 0.05;
+times = 0:dt:T;
+time_offset = 0; 
+for n=1:size(times,2)
     cla 
+    hold on
+    t = times(n) - time_offset;
+    % Plot planes and goal
+    plot_lanes_goal(lane_num, lane_dist, xf, end_dist)
+    
     % Update and Plot Obstacles
     for i = 1:num_obs
-        obs_vect(i).A = update_obstacle(obs_vect(i).A, i, 0.2);
+        obs_vect(i).A = update_obstacle(obs_vect(i).A, t, dt);
         plot_obstacle(obs_vect(i).A);
     end
-    plot(X(1,:), X(2,:), '-r')
-    % Our car
-    rectangle('Position', [0 (lane_dist/2 - car_width/2) car_len car_width], 'Curvature', 0.2, 'FaceColor', 'b', 'EdgeColor', 'b');
-    hold on
-    % Adding lanes
-    for i = 1:lane_num-1
-        yline(lane_dist*i, 'k-.');
+    
+    if (gt_re)
+        [X, dX, A] = generate_trajectories(x_state(0:3), xf, 1, T-t);
+        S.A = A;
+        time_offset = t; 
     end
-    plot(xf(1), xf(2), '*');
-    axis([0 end_dist 0 lane_num*lane_dist]);
+    % Plot desired trajectory
+    plot(X(1,:), X(2,:), '-r')
+    % Update and Plot Car
+    dxa = car_ode_bs(t, x_state, S);
+    x_state = x_state + dxa*dt;
+    plot_car(x_state, car_len, car_width);
     gif
 end
 
