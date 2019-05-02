@@ -8,7 +8,7 @@ d2yd = S.A*d2poly3(t);
 
 % get current output
 y = car_h(x);
-v = x(4);
+v = x(end);
 R = rot(x(3));
 
 k0 = S.k(1);
@@ -18,8 +18,8 @@ dy = [v*cos(x(3));
     v*sin(x(3))];
 e = y-yd;
 de = dy - dyd;
-z = de +  k0*e;
-s = R.'*(d2yd -k0*de -k1*z);
+z = -yd + S.k(1)*e + dy;
+s = R'*(d2yd - e - S.k(1)*de - S.k(2)*z);
 u2 = s(1);
 u1 = atan2(s(2)*S.l, v^2);
 ua = [u1;u2];
