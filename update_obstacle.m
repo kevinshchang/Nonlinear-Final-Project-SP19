@@ -1,3 +1,4 @@
-function new_A = update_obstacle(A, t, dt)
-new_A = A;
-new_A.p(1) = A.p(1) + A.v*dt;
+function A_new = update_obstacle(A, t)
+    A_new = A;
+    A_new.p(1) = A_new.p0(1) + A_new.v*t;
+

@@ -3,7 +3,7 @@ function A = generate_obstacle(p, width, height, v)
 %width is x size (centered around p)
 %height is y size (centered around p)
 %v(t) is velocity function
-
+A.p0 = p;
 A.p = p;
 A.width = width;
 A.height = height;

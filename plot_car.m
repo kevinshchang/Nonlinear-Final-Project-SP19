@@ -1,10 +1,11 @@
-function f = plot_car(x_state, car_len, car_width)
+function f = plot_car(x_state, S)
 %https://math.stackexchange.com/questions/2518607/how-to-find-vertices-of-a-rectangle-when-center-coordinates-and-angle-of-tilt-is
+%http://msl.cs.uiuc.edu/planning/node658.html
     theta = x_state(3);
-    w = car_len/2;
-    b = car_width/2;
-    xc = x_state(1);
-    yc = x_state(2);
+    w = S.car_len/2;
+    b = S.car_width/2;
+    xc = x_state(1) + (S.l/2)*cos(theta);
+    yc = x_state(2) + (S.l/2)*sin(theta);
     x1 = xc - w*cos(theta) - b*sin(theta);
     x2 = xc + w*cos(theta) - b*sin(theta);
     x3 = xc + w*cos(theta) + b*sin(theta);
