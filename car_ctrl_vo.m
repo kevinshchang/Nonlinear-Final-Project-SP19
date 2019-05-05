@@ -12,11 +12,6 @@ for i = 1:n
         A = S.obs_vect(j).A;
         pB = A.p - xa(1:2); %set car as origin of obstacle distance
         vB = [A.v;0];
-        v = u1*[cos(xa(3)); sin(xa(3))];
-        C(T) = [(sin(u(1)*tan(u2)*T))/tan(u(2)); 
-        -(cos(u(1)*tan(u2)*T)/tan(u(2))) + 1/tan(u(2))]; % position of the car
-        B(T) = pB + vB*T;
-        D(T) = C - B; %distance between obstacle and car D(t);
         for k=0:0.01:tlim
             C = [(sin(u(1)*tan(u2)*k))/tan(u(2)); 
                 -(cos(u(1)*tan(u2)*k)/tan(u(2))) + 1/tan(u(2))]; % position of the car
