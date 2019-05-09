@@ -1,9 +1,22 @@
-function u = car_ctrl_care_simple(t, x, S)
+function [u, S] = car_ctrl_care_simple(t, x, S)
 % tracking control law
 % get desired outputs (x-y positions, velocities, accelerations)
-yd = S.A*poly3(t);
-dyd = S.A*dpoly3(t);
-d2yd = S.A*d2poly3(t);
+t_rel = t - S.t_offset;
+
+yd = S.A*poly3(t_rel);
+dyd = S.A*dpoly3(t_rel);
+d2yd = S.A*d2poly3(t_rel);
+
+if (norm(x(1:2) - yd) > 3)
+    S.t_offset = t;
+    [S.X, S.A] = generate_trajectories_simple(x, S.xf, 10, S.T-t);
+    plot(S.X(1,:), S.X(2,:), '-b')
+    yd = S.A*poly3(0);
+    dyd = S.A*dpoly3(0);
+    d2yd = S.A*d2poly3(0);
+end
+
+
 
 % desired angle
 x3d = atan2(dyd(2), dyd(1));
@@ -29,3 +42,4 @@ B = [cos(x3d) 0;
 
 % set control law
 u = ud - K*(x - xd);
+% u(2) = mod(u(2), 2*(pi));
