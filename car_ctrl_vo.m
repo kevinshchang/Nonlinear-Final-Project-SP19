@@ -81,7 +81,7 @@ for i = 1:n
             %Check freeway walls
             if (k<tlim_wall)
                 y = C(2) + xa(2);
-                if (y >= S.lane_dist*(S.lane_num+1) || y <= 0)
+                if (y >= S.lane_dist*(S.lane_num+1)-0.75 || y <= 0.75)
                     free = 0;
                 end
             end
@@ -113,7 +113,7 @@ for i = 1:n
     end
 end
 if (uout(1) == -100)
-    warning('COULD NOT FIND VALID INPUT. INPUT IS U*');
+    warning('COULD NOT FIND VALID INPUT. INPUT IS 0');
     uout = [0; 0];
 end
 

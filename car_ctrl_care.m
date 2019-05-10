@@ -1,4 +1,4 @@
-function ua = car_ctrl_care(t, xa, S)
+function [ua, S] = car_ctrl_care(t, xa, S)
 % tracking control law (differential flatness)
 
 % get desired outputs:

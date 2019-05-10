@@ -1,7 +1,9 @@
 function [dxa, S, us] = car_ode_vo(t, dt, xa, S, us)
 cla 
 hold on
-
+if (xa(2) >=S.lane_dist*(S.lane_num+1)-.5 || xa(2) < .5) 
+    warning('collision')
+end
 
 % Plot planes and goal
 plot_lanes_goal(S);
@@ -9,7 +11,7 @@ plot_lanes_goal(S);
 for i = 1:S.num_obs
     S.obs_vect(i).A = update_obstacle(S.obs_vect(i).A, dt);
     if (norm(S.obs_vect(i).A.p - xa(1:2)) < 1.25) 
-        error('collision')
+        warning('collision')
     end
 end
 plot_obstacle(S);

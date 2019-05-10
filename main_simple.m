@@ -15,11 +15,11 @@ S.gt_re = 0; % boolean for resampling of trajectory generation per timestep
 S.car_width = 1; % width of car in meters
 S.car_len = 1; % length of car in meters
 obs_vel = 10; % obstacle velocity
-S.num_obs = 50; % number of obstacles
+S.num_obs = 25; % number of obstacles
 S.lane_num = 3; % number of lanes
 S.lane_dist = 5; % distance in (y) for lanes in meters
 S.end_dist = 100; % distance in (x) for exit in meters
-S.exit_ang = 0.785; % exit angle in rads
+S.exit_ang = 0; % exit angle in rads
 S.t_offset = 0;
 sim_time = 10; % simulation time for ode + controls
 
@@ -30,7 +30,7 @@ S.l = 1;
 % Boundary Conditions:
 x0 = [S.car_len/2; S.lane_dist/2; 0]; % starting position
 u_initial = [10; 0];
-S.xf = [S.end_dist; (S.lane_num+0.5)*S.lane_dist; 0]; % desired end position
+S.xf = [S.end_dist; (S.lane_num+0.5)*S.lane_dist; S.exit_ang]; % desired end position
 S.T = sim_time;
 % Setup of initial conditions
 if (S.gt_type == 1)
@@ -106,7 +106,7 @@ figure;
 plot(T, us(1,:) , '.');
 title('u1')
 xlabel('time')
-ylabel('u1 (acceleration in m/s)')
+ylabel('u1 (acceleration in m/s^2)')
 figure;
 plot(T, us(2,:), '.');
 title('u2')
